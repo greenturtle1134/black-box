@@ -1,7 +1,7 @@
 # black-box
 Typing behind a black screen.
 
-This thing allows you to type without seeing what you're typing so that you aren't constantly editing what you've written. After every word is written it slowly fades into the black void. A word count is provided to track your progress. It's kind of like [www.ilys.com](www.ilys.com) except it breaks by word, rather than character, and it doesn't charge money.
+This thing allows you to type without seeing what you're typing so that you aren't constantly editing what you've written. It's meant as a tool for people participating in [National Novel Writing Month](https://nanowrimo.org). After every word is written it slowly fades into the black void. A word count is provided to track your progress. It's kind of like [www.ilys.com](www.ilys.com) except it breaks by word, rather than character, and it doesn't charge money.
 
 # How to use
 
