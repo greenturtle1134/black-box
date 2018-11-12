@@ -2,6 +2,10 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +29,8 @@ public class Application extends JPanel implements Runnable {
 	private JTextArea textOutput;
 	
 	private int state;
+	
+	private String session;
 	private int getState() {
 		return state;
 	}
@@ -58,6 +64,8 @@ public class Application extends JPanel implements Runnable {
 		
 		this.state = MODE_MAIN;
 		
+		this.session = new Date().toString().replaceAll(":", " ");
+		
 		Thread thread = new Thread(this);
 		thread.start();
 	}
@@ -75,6 +83,7 @@ public class Application extends JPanel implements Runnable {
 				centerPanel.flash();
 				if(text.charAt(text.length()-1)!='\n') {
 					text.append("\n\n");
+					this.save();
 				}
 			}
 			else {
@@ -92,6 +101,17 @@ public class Application extends JPanel implements Runnable {
 			count++;
 		}
 		this.centerPanel.setWordCount(count);
+	}
+	
+	public void save() {
+		try {
+			PrintWriter out = new PrintWriter(this.session+".txt");
+			out.write(this.text.toString());
+			out.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {
@@ -132,6 +152,7 @@ public class Application extends JPanel implements Runnable {
 				Application.this.setState(MODE_OUTPUT);
 				Application.this.revalidate();
 				Application.this.textOutput.revalidate();
+				Application.this.save();
 				break;
 			case MODE_OUTPUT:
 				Application.this.remove(Application.this.textOutput);
@@ -143,6 +164,7 @@ public class Application extends JPanel implements Runnable {
 				Application.this.setState(MODE_MAIN);
 				Application.this.revalidate();
 				Application.this.centerPanel.revalidate();
+				Application.this.save();
 				break;
 			}
 		}
