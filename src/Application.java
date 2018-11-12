@@ -106,7 +106,11 @@ public class Application extends JPanel implements Runnable {
 	public void save() {
 		try {
 			PrintWriter out = new PrintWriter(this.session+".txt");
-			out.write(this.text.toString());
+			String[] lines = this.text.toString().split("\\n+");
+			for(String string : lines) {
+				out.println(string);
+				out.println();
+			}
 			out.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
