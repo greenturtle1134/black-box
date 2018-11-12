@@ -5,6 +5,8 @@ This thing allows you to type without seeing what you're typing so that you aren
 
 # How to use
 
+**NOTICE: This WILL start creating text files. You probably want it in a seperate folder so it doesn't clutter your desktop.**
+
 You will need to click the black screen in order to start typing. Hold control and press enter to see what you've written. You can edit or copy it out. Press ctrl-enter again to go back to writing. Spaces and line breaks count as word changes, and your text will be saved to a file with the date and time every time you press enter.
 
 # Things I plan on adding
