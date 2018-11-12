@@ -65,12 +65,12 @@ public class Application extends JPanel implements Runnable {
 	public void addChar(char c) {
 		if(c==' ') {
 			centerPanel.breakWord();
-			if(text.charAt(text.length()-1)!=' ') {
+			if(text.length()>0&&text.charAt(text.length()-1)!=' ') {
 				text.append(' ');
 			}
 		}
 		else {
-			if(c=='\n') {
+			if(text.length()>0&&c=='\n') {
 				centerPanel.breakWord();
 				centerPanel.flash();
 				if(text.charAt(text.length()-1)!='\n') {

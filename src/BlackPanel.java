@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 
 public class BlackPanel extends JPanel {
-	
+
 	/**
 	 * 
 	 */
@@ -24,7 +24,7 @@ public class BlackPanel extends JPanel {
 	private long flashTime;
 	private int wordCount;
 	private boolean showCount;
-	
+
 	public int getWordCount() {
 		return wordCount;
 	}
@@ -44,7 +44,7 @@ public class BlackPanel extends JPanel {
 	public void addChar(char c) {
 		thisWord.append(c);
 	}
-	
+
 	public void breakWord() {
 		if (thisWord.length()>0) {
 			FadeWord word = new FadeWord(thisWord.toString(), wordX, wordY, this);
@@ -59,32 +59,36 @@ public class BlackPanel extends JPanel {
 		wordX = (int) ((this.getWidth() - X_MARGIN) * Math.random());
 		wordY = (int) ((this.getHeight() - Y_MARGIN) * Math.random());
 	}
-	
+
 	public void flash() {
 		this.flashTime = System.currentTimeMillis();
 	}
-	
+
 	public void doTick() {
 		this.repaint();
-		while(words.peekFirst()!=null&&words.peekFirst().getTone()<2) {
-			words.pollFirst();
-		}
 	}
-	
+
 	public int getShade() {
 		return (int) (MAX_TONE/(1.0d+(System.currentTimeMillis()-this.flashTime)/HALFTIME));
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		int tone = this.getShade();
 		g.setColor(new Color(tone, tone, tone));
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		boolean takeOne = false;
 		if (!words.isEmpty()) {
 			FadeWord[] array = words.toArray(new FadeWord[words.size()]);
 			for (FadeWord w : array) {
 				w.draw(g);
+				if(w.getTone()<2) {
+					takeOne = true;
+				}
 			}
+		}
+		if(takeOne) {
+			words.pollFirst();
 		}
 		g.setFont(WORD_FONT);
 		g.setColor(Color.GREEN);
@@ -93,7 +97,7 @@ public class BlackPanel extends JPanel {
 			g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
 		}
 	}
-	
+
 	public BlackPanel() {
 		super();
 		thisWord = new StringBuffer("");
@@ -104,9 +108,9 @@ public class BlackPanel extends JPanel {
 		wordCount = 0;
 		showCount = false;
 	}
-	
+
 	private class ClickListener extends MouseAdapter {
-		
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			BlackPanel.this.requestFocusInWindow();
