@@ -55,7 +55,7 @@ public class Application extends JPanel implements Runnable {
 		
 		Application.TypeListener listener = new TypeListener();
 		centerPanel.addKeyListener(listener);
-
+		
 		Application.ToggleAction altAction = this.new ToggleAction();
 		centerPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK), "alt");
 		centerPanel.getActionMap().put("alt", altAction);

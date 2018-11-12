@@ -16,14 +16,18 @@ public class BlackPanel extends JPanel {
 	public static final Font WORD_FONT = new Font("Serif", Font.BOLD, 28);
 	public static final int X_MARGIN = 50;
 	public static final int Y_MARGIN = 10;
-	private static final double MAX_TONE = 255;
-	private static final double HALFTIME = 100;
+	public static final double MAX_TONE = 255;
+	public static final double HALFTIME = 100;
+	public static final double CHANGE_RATIO = 0.1;
+	public static final long TIME_THRESHOLD = 30000;
 	private StringBuffer thisWord;
 	private int wordX, wordY;
 	private LinkedList<FadeWord> words;
 	private long flashTime;
 	private int wordCount;
 	private boolean showCount;
+	private double currentPace;
+	private long lastTime;
 
 	public int getWordCount() {
 		return wordCount;
@@ -52,6 +56,20 @@ public class BlackPanel extends JPanel {
 			thisWord.delete(0, thisWord.length());
 			changeLoc();
 			this.setWordCount(this.getWordCount() + 1);
+			long time = System.currentTimeMillis();
+			if (time-lastTime<TIME_THRESHOLD) {
+				//This means that the time counted is valid.
+				if (currentPace>0) {
+					//Current pace is set
+					currentPace = (time - lastTime) * CHANGE_RATIO + currentPace * (1 - CHANGE_RATIO);
+					System.out.println(60000 / currentPace);
+				}
+				else {
+					//Current pace not set
+					currentPace = time-lastTime;
+				}
+			}
+			lastTime = time;
 		}
 	}
 
@@ -107,6 +125,7 @@ public class BlackPanel extends JPanel {
 		this.addMouseListener(this.new ClickListener());
 		wordCount = 0;
 		showCount = false;
+		currentPace = -1;
 	}
 
 	private class ClickListener extends MouseAdapter {
