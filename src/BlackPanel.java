@@ -9,6 +9,11 @@ import javax.swing.JPanel;
 
 public class BlackPanel extends JPanel {
 
+	public enum Mode {
+		FORWARD,
+		BACKWARD
+	}
+
 	/**
 	 * 
 	 */
@@ -28,6 +33,7 @@ public class BlackPanel extends JPanel {
 	private boolean showCount;
 	private double currentPace;
 	private long lastTime;
+	private Mode mode;
 
 	public int getWordCount() {
 		return wordCount;
@@ -47,6 +53,7 @@ public class BlackPanel extends JPanel {
 
 	public void addChar(char c) {
 		thisWord.append(c);
+		mode = Mode.FORWARD;
 	}
 
 	public void breakWord() {
@@ -78,6 +85,22 @@ public class BlackPanel extends JPanel {
 		wordY = (int) ((this.getHeight() - Y_MARGIN) * Math.random());
 	}
 
+	public void backspace() {
+		this.mode = Mode.BACKWARD;
+		if(thisWord.length()==0) {
+			this.setWordCount(this.getWordCount()-1);
+			return;
+		}
+		this.thisWord.deleteCharAt(thisWord.length()-1);
+		if(thisWord.length()==0) {
+			this.setWordCount(this.getWordCount()-1);
+		}
+	}
+	
+	public void setWord(String word) {
+		this.thisWord = new StringBuffer(word);
+	}
+	
 	public void flash() {
 		this.flashTime = System.currentTimeMillis();
 	}
@@ -92,27 +115,42 @@ public class BlackPanel extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		int tone = this.getShade();
-		g.setColor(new Color(tone, tone, tone));
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		boolean takeOne = false;
-		if (!words.isEmpty()) {
-			FadeWord[] array = words.toArray(new FadeWord[words.size()]);
-			for (FadeWord w : array) {
-				w.draw(g);
-				if(w.getTone()<2) {
-					takeOne = true;
+		int tone;
+		switch(mode) {
+		case FORWARD:
+			tone = this.getShade();
+			g.setColor(new Color(tone, tone, tone));
+			g.fillRect(0, 0, this.getWidth(), this.getHeight());
+			boolean takeOne = false;
+			if (!words.isEmpty()) {
+				FadeWord[] array = words.toArray(new FadeWord[words.size()]);
+				for (FadeWord w : array) {
+					w.draw(g);
+					if(w.getTone()<2) {
+						takeOne = true;
+					}
 				}
 			}
-		}
-		if(takeOne) {
-			words.pollFirst();
-		}
-		g.setFont(WORD_FONT);
-		g.setColor(Color.GREEN);
-		g.drawString(thisWord.toString(), wordX, wordY);
-		if(showCount) {
-			g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+			if(takeOne) {
+				words.pollFirst();
+			}
+			g.setFont(WORD_FONT);
+			g.setColor(Color.GREEN);
+			g.drawString(thisWord.toString(), wordX, wordY);
+			if(showCount) {
+				g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+			}
+			break;
+		case BACKWARD:
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, this.getWidth(), this.getHeight());
+			g.setFont(WORD_FONT);
+			g.setColor(Color.RED);
+			g.drawString(thisWord.toString(), wordX, wordY);
+			if(showCount) {
+				g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+			}
+			break;
 		}
 	}
 
@@ -122,12 +160,13 @@ public class BlackPanel extends JPanel {
 		wordX=0;
 		wordY=0;
 		words = new LinkedList<FadeWord>();
+		this.mode = Mode.FORWARD;
 		this.addMouseListener(this.new ClickListener());
 		wordCount = 0;
 		showCount = false;
 		currentPace = -1;
 	}
-
+	
 	private class ClickListener extends MouseAdapter {
 
 		@Override
