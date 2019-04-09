@@ -97,25 +97,22 @@ public class Application extends JPanel implements Runnable {
 		if(text.length()==0) {
 			return;
 		}
-		text.deleteCharAt(text.length()-1);
-		if(text.length()==0) {
-			centerPanel.backspace();
-		}
 		else if(text.charAt(text.length()-1)=='\n') {
 			text.delete(text.length()-2, text.length());
 			centerPanel.backspace();
 			String[] words = text.toString().split("\\s+");
 			centerPanel.setWord(words[words.length-1]);
-			centerPanel.changeLoc();
+			centerPanel.rewindLoc();
 		}
 		else if(text.charAt(text.length()-1) == ' ') {
 			text.deleteCharAt(text.length()-1);
 			centerPanel.backspace();
 			String[] words = text.toString().split("\\s+");
 			centerPanel.setWord(words[words.length-1]);
-			centerPanel.changeLoc();
+			centerPanel.rewindLoc();
 		}
 		else {
+			text.deleteCharAt(text.length()-1);
 			centerPanel.backspace();
 		}
 	}
@@ -169,7 +166,6 @@ public class Application extends JPanel implements Runnable {
 		public void keyPressed(KeyEvent e) {
 			if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 				Application.this.backspace();
-				System.out.println("Backspacing");
 			}
 		}
 	}

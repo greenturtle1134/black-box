@@ -23,15 +23,16 @@ public class BlackPanel extends JPanel {
 	public static final int Y_MARGIN = 10;
 	public static final double MAX_TONE = 255;
 	public static final double HALFTIME = 100;
-	public static final double CHANGE_RATIO = 0.1;
+	public static final double CHANGE_RATIO = 0.001;
 	public static final long TIME_THRESHOLD = 30000;
+	public static final long MIN_TIME = 500;
 	private StringBuffer thisWord;
 	private int wordX, wordY;
 	private LinkedList<FadeWord> words;
 	private long flashTime;
 	private int wordCount;
 	private boolean showCount;
-	private double currentPace;
+	private double currentSpeed;
 	private long lastTime;
 	private Mode mode;
 
@@ -64,19 +65,41 @@ public class BlackPanel extends JPanel {
 			changeLoc();
 			this.setWordCount(this.getWordCount() + 1);
 			long time = System.currentTimeMillis();
-			if (time-lastTime<TIME_THRESHOLD) {
-				//This means that the time counted is valid.
-				if (currentPace>0) {
-					//Current pace is set
-					currentPace = (time - lastTime) * CHANGE_RATIO + currentPace * (1 - CHANGE_RATIO);
-					System.out.println(60000 / currentPace);
-				}
-				else {
-					//Current pace not set
-					currentPace = time-lastTime;
-				}
+			long diff = time-lastTime;
+			if (diff<TIME_THRESHOLD) {
+				currentSpeed = (60000 / (diff) * rate(diff)) + (currentSpeed * (1 - rate(diff)));
 			}
 			lastTime = time;
+		}
+	}
+
+	public double rate(long diff) {
+		return 1-Math.pow(1-CHANGE_RATIO, (diff));
+	}
+	
+	public double getPace() {
+		long time = System.currentTimeMillis();
+		long diff = timeCorrect(time);
+		if(diff<TIME_THRESHOLD) {
+			return (60000 / (diff) * rate(diff)) + (currentSpeed * (1 - rate(diff)));
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public long timeCorrect(long time) {
+		return time - lastTime + MIN_TIME;
+	}
+	
+	public void rewindLoc() {
+		if(!words.isEmpty()) {
+			FadeWord word = words.pollLast();
+			wordX = word.getX();
+			wordY = word.getY();
+		}
+		else {
+			changeLoc();
 		}
 	}
 
@@ -92,9 +115,6 @@ public class BlackPanel extends JPanel {
 			return;
 		}
 		this.thisWord.deleteCharAt(thisWord.length()-1);
-		if(thisWord.length()==0) {
-			this.setWordCount(this.getWordCount()-1);
-		}
 	}
 	
 	public void setWord(String word) {
@@ -138,7 +158,7 @@ public class BlackPanel extends JPanel {
 			g.setColor(Color.GREEN);
 			g.drawString(thisWord.toString(), wordX, wordY);
 			if(showCount) {
-				g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+				g.drawString(this.getPace()+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
 			}
 			break;
 		case BACKWARD:
@@ -164,7 +184,8 @@ public class BlackPanel extends JPanel {
 		this.addMouseListener(this.new ClickListener());
 		wordCount = 0;
 		showCount = false;
-		currentPace = -1;
+		currentSpeed = 0.0;
+		System.out.println(60000/MIN_TIME*rate(MIN_TIME));
 	}
 	
 	private class ClickListener extends MouseAdapter {
