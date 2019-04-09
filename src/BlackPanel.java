@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
@@ -18,14 +19,15 @@ public class BlackPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public static final Font WORD_FONT = new Font("Serif", Font.BOLD, 28);
-	public static final int X_MARGIN = 50;
-	public static final int Y_MARGIN = 10;
+	public static final Font WORD_FONT = new Font("Dialog", Font.BOLD, 24);
+	public static final int X_MARGIN = 100;
+	public static final int Y_MARGIN = 20;
 	public static final double MAX_TONE = 255;
 	public static final double HALFTIME = 100;
 	public static final double CHANGE_RATIO = 0.001;
 	public static final long TIME_THRESHOLD = 30000;
 	public static final long MIN_TIME = 500;
+	public static final DecimalFormat SPEED_FORMAT = new DecimalFormat("0.0");
 	private StringBuffer thisWord;
 	private int wordX, wordY;
 	private LinkedList<FadeWord> words;
@@ -77,7 +79,7 @@ public class BlackPanel extends JPanel {
 		return 1-Math.pow(1-CHANGE_RATIO, (diff));
 	}
 	
-	public double getPace() {
+	public double getSpeed() {
 		long time = System.currentTimeMillis();
 		long diff = timeCorrect(time);
 		if(diff<TIME_THRESHOLD) {
@@ -104,7 +106,7 @@ public class BlackPanel extends JPanel {
 	}
 
 	public void changeLoc() {
-		wordX = (int) ((this.getWidth() - X_MARGIN) * Math.random());
+		wordX = (int) ((this.getWidth() - 2*X_MARGIN) * Math.random()) + X_MARGIN;
 		wordY = (int) ((this.getHeight() - Y_MARGIN) * Math.random());
 	}
 
@@ -158,7 +160,7 @@ public class BlackPanel extends JPanel {
 			g.setColor(Color.GREEN);
 			g.drawString(thisWord.toString(), wordX, wordY);
 			if(showCount) {
-				g.drawString(this.getPace()+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+				drawData(g);
 			}
 			break;
 		case BACKWARD:
@@ -168,10 +170,19 @@ public class BlackPanel extends JPanel {
 			g.setColor(Color.RED);
 			g.drawString(thisWord.toString(), wordX, wordY);
 			if(showCount) {
-				g.drawString(wordCount+"", (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+				drawData(g);
 			}
 			break;
 		}
+	}
+
+	public void drawData(Graphics g) {
+		g.drawString("Words written: "+this.getWordCount(), (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2);
+		g.drawString("WPS: "+getSpeedString(), (this.getWidth()-X_MARGIN)/2, (this.getHeight()-Y_MARGIN)/2+30);
+	}
+
+	public String getSpeedString() {
+		return SPEED_FORMAT.format(this.getSpeed());
 	}
 
 	public BlackPanel() {
