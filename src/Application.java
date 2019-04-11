@@ -55,7 +55,7 @@ public class Application extends JPanel implements Runnable {
 		
 		Application.TypeListener listener = new TypeListener();
 		centerPanel.addKeyListener(listener);
-
+		
 		Application.ToggleAction altAction = this.new ToggleAction();
 		centerPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK), "alt");
 		centerPanel.getActionMap().put("alt", altAction);
@@ -90,6 +90,30 @@ public class Application extends JPanel implements Runnable {
 				centerPanel.addChar(c);
 				text.append(c);
 			}
+		}
+	}
+	
+	public void backspace() {
+		if(text.length()==0) {
+			return;
+		}
+		else if(text.charAt(text.length()-1)=='\n') {
+			text.delete(text.length()-2, text.length());
+			centerPanel.backspace();
+			String[] words = text.toString().split("\\s+");
+			centerPanel.setWord(words[words.length-1]);
+			centerPanel.rewindLoc();
+		}
+		else if(text.charAt(text.length()-1) == ' ') {
+			text.deleteCharAt(text.length()-1);
+			centerPanel.backspace();
+			String[] words = text.toString().split("\\s+");
+			centerPanel.setWord(words[words.length-1]);
+			centerPanel.rewindLoc();
+		}
+		else {
+			text.deleteCharAt(text.length()-1);
+			centerPanel.backspace();
 		}
 	}
 	
@@ -133,7 +157,16 @@ public class Application extends JPanel implements Runnable {
 		
 		@Override
 		public void keyTyped(KeyEvent e) {
-			Application.this.addChar(e.getKeyChar());
+			if(!(e.getKeyChar() == '\b')) {
+				Application.this.addChar(e.getKeyChar());
+			}
+		}
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				Application.this.backspace();
+			}
 		}
 	}
 	
